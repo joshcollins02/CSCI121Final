@@ -1,0 +1,4 @@
+This is a repository for Harry and Josh's CSCI121 final project.
+
+We did a forest fire prediction system:
+This takes the Longitude, Latitude, and Date of your choosing, it will then return based on a CSV file if there are any nearby fires on that date that will harm you.
