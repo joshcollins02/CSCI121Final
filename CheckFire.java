@@ -73,6 +73,7 @@ public class CheckFire extends JFrame {
                     boolean isSafe = true;
                     String closestFireId = "";
                     String closestFireName = "";
+                    String closestDate = "";
                     double closestDistance = Double.MAX_VALUE;
                     if (scanner.hasNextLine()) {
                         scanner.nextLine();
@@ -82,38 +83,54 @@ public class CheckFire extends JFrame {
                         String line = scanner.nextLine();
                         String[] values = line.split(",");
                         if (values.length >= 10) {
-                            try {
+//                            try {
                                 double fireX = Double.parseDouble(values[5].trim());
                                 double fireY = Double.parseDouble(values[6].trim());
                                 LocalDate fireDate = LocalDate.parse(values[3].trim().split(" ")[0], formatter);
+                                System.out.println(fireDate);  // harry test
+                                System.out.println(fireDate.isBefore(inputDate)); // harry test
                                 String fireIdentifier = values[9].trim();
                                 String fireName = values[4].trim();
+                                String fireDateStr = values[3].trim(); // harry adjust
                                 calculateDistance t = new calculateDistance(latValue, longValue, fireY, fireX);
                                 double distance = t.getDistance();
-                                if (distance < FIRE_RADIUS_KM) {
+                                if (distance < FIRE_RADIUS_KM && fireDate.isBefore(inputDate) == true) {
                                     isSafe = false;
+                                    closestDistance = distance; // harry adjust
                                     closestFireId = fireIdentifier;
                                     closestFireName = fireName;
+                                    closestDate = fireDateStr; // harry adjust
                                     break;
-                                }
-                                if (!fireDate.isBefore(inputDate) && distance < SAFE_DISTANCE_KM && distance < closestDistance) {
+                                } // harry adjust: deleted ' && distance < closestDistance ' from if below
+                                if (fireDate.isBefore(inputDate) == true && distance < SAFE_DISTANCE_KM && distance < closestDistance) {
                                     closestDistance = distance;
                                     closestFireId = fireIdentifier;
                                     closestFireName = fireName;
+                                    closestDate = fireDateStr; // harry adjust
                                     isSafe = false;
+                                    break; // harry adjustment
                                 }
-                            } catch (DateTimeParseException | NumberFormatException var31) {
-                                // this is an error with the data. Will only do a system print since it is unlikely
-                                // a user of the GUI would be fixing the actual fire data
-                                System.out.println("Error parsing data: " + var31.getMessage());
-                            }
+//                            }
+//                            catch (DateTimeParseException | NumberFormatException var31) {
+//                                // this is an error with the data. Will only do a system print since it is unlikely
+//                                // a user of the GUI would be fixing the actual fire data
+//                                System.out.println("Error parsing data: " + var31.getMessage());
+//                            }
                         }
                     }
 
                     if (isSafe) {
                         System.out.println("You are safe from nearby fires.");
+                        final ImageIcon smokeyImg = new ImageIcon("smokey_the_bear3.jpg");
+                        JOptionPane.showMessageDialog(null, "You are safe from nearby fires!",
+                                "Smokey the Bear's Inspirational Message", JOptionPane.INFORMATION_MESSAGE, smokeyImg);
                     } else {
-                        System.out.printf("You are dangerously close to %s - %s, which is only %.2f km away.\n", closestFireId, closestFireName, closestDistance);
+                        System.out.printf("You are dangerously close to %s - %s - %s, which is only %.2f km away.\n", closestFireName, closestDate, closestFireId, closestDistance);
+                        final ImageIcon fireImg = new ImageIcon("fire_image2.jpg");
+                        JOptionPane.showMessageDialog(null, "You are dangerously close to " +
+                                        "the fire.\nThe fire known as " + closestFireName + " which is only " +
+                                        String.format("%.2f", (closestDistance)) + " km away.\nFire ID: " + closestFireId,
+                                "Smokey the Bear's Warning", JOptionPane.INFORMATION_MESSAGE, fireImg);
                     }
 
                     userInputs.setText(String.format("Latitude " + latValue + " Longitude " + longValue + " Date " +
@@ -133,7 +150,8 @@ public class CheckFire extends JFrame {
                 } catch(DateTimeParseException ex) {
                     final ImageIcon dateImg = new ImageIcon("date_example.png");
                     JOptionPane.showMessageDialog(null, "Hey! Let's try reading the " +
-                                    "instructions!  \nGo ahead... try putting the date in the proper format :)",
+                                    "instructions!  \nGo ahead... try putting the date in the proper format :)" +
+                                    "\np.s. dates that do not exist won't work either",
                             "Lacking Reading Comprehension Skills", JOptionPane.INFORMATION_MESSAGE, dateImg);
                     // resets the improper entry
                     dateField.setText("");
@@ -166,6 +184,10 @@ public class CheckFire extends JFrame {
         setVisible(true);
     }
 
+    public static void locateGUI(){
+
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new CheckFire());
     }
@@ -177,3 +199,16 @@ public class CheckFire extends JFrame {
 //           besides the proper date format. It also resets the box when the wrong date format is inputted. Or a non-integer
 //           Do not use a JOptionPane if the file is not found because people running it should have the FireData.csv
 //           file in their project within IntelliJ
+
+// Future adjustments:
+// Adaptions - allow users to enter the other types of coordinates and have the code manually calculate // rearrange
+//                the coordinates into the simple decimal system. i.e., Degrees/Minutes/Seconds -> decimals
+
+
+// Issues:
+// Data - the data does not have a reported fire end date, so in order to make 99% of the fires work, we have it set
+//        that if the fire occurred and it's the newest / closest fire, then the user will be "in danger". However,
+//        this isn't good because if a fire is the newest fire in the data set, you could put a date one year down the
+//        line and it was still tell the user they are "in danger", which is unrealistic.  We considered using a baseline
+//        of 10 days, so after 10 days the user would simply be safe. However, we had difficulty making that function
+//        and some fires do last a month.
