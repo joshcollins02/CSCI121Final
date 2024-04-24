@@ -1,3 +1,4 @@
+// Refer to README for formula sources
 public class calculateDistance {
     private double lat1;
     private double lon1;
@@ -12,8 +13,8 @@ public class calculateDistance {
         this.lon2 = lon2;
     }
 
-    // math is from the following website:
-    // https://community.esri.com/t5/coordinate-reference-systems-blog/distance-on-a-sphere-the-haversine-formula/ba-p/902128#:~:text=All%20of%20these%20can%20be,longitude%20of%20the%20two%20points
+    // Uses the Haversine formula. The Haversine Formula utilizes trigonometry to measure the distance between
+    // two points.
     public double getDistance() {
         final int R = 6371; // Radius of the Earth in kilometers
 
@@ -25,5 +26,21 @@ public class calculateDistance {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c;
         return distance;
+    }
+
+    // Gives the approximate time for the fire to reach the user
+    public String getTime() {
+        double dist = getDistance();
+        double hours = (dist / 22.97); //kmh for average forest fire spread
+        int mins =  (int) Math.floor(hours * 60);
+
+        // gives different returns whether the fire is over an hour away or not
+        if (mins / 60 >= 1) {
+            int hoursT = (int) Math.floor(mins / 60);
+            int minsT = (mins % 60);
+            return "The fire will take approximately " + hoursT + " hour(s) and " +
+                    minsT + " minutes to get to your location.";
+        }
+        return "The fire will take approximately " + mins + " minutes to get to your location.";
     }
 }
