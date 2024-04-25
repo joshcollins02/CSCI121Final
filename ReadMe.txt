@@ -40,3 +40,11 @@ Wild Fire Spread Rate - https://wfca.com/wildfire-articles/how-fast-do-wildfires
                         20an%20average%20of%2014.27%20miles,such%20as%20weather%20conditions%2C%20fuel%20type%2C%20and%20terrain
 Haversine Distance Formula - https://community.esri.com/t5/coordinate-reference-systems-blog/distance-on-a-sphere-the-
                              haversine-formula/ba-p/902128#:~:text=All%20of%20these%20can%20be,longitude%20of%20the%20two%20points
+
+                             Cuts the circle into a plain
+                             has a lat phi and lat theta
+                             has a long phi and long theta
+                             you find theta in terms of phi and lamda -> (c) finds the angle of theta by using artan(x/y)
+
+                             Once you cut the sphere into a circle all you have to do is find the theta in terms of latitude and longitude
+                             and when you have the angle theta, then theta times R gets you the distance
